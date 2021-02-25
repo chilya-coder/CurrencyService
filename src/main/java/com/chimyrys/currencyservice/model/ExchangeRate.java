@@ -1,47 +1,80 @@
 package com.chimyrys.currencyservice.model;
 
+/**
+ * Class that describes exchange rate for ALL banks
+ * with following parameters:
+ * currencyFrom - money we convert from
+ * currencyTo - money we convert to
+ * resultValue - coefficient
+ * dateTime - date of actual exchange rate
+ */
 public class ExchangeRate {
-    private Currency baseCurrency;
-    private Currency currency;
-    private float resultValue;
-    private Date dateTime;
+    private Currency currencyFrom; // currency we convert from
+    private Currency currencyTo; // currency we convert to
+    private float sellRate; // how much currency is worth to buy
+    private float buyRate; // how much currency is worth to sell
+    private RateDate rateDateTime; //date
 
-    public ExchangeRate(Currency baseCurrency, Currency currency, float resultValue, Date dateTime) {
-        this.baseCurrency = baseCurrency;
-        this.currency = currency;
-        this.resultValue = resultValue;
-        this.dateTime = dateTime;
+    public ExchangeRate(Currency baseCurrency, Currency currency, float sellRate, float buyRate, RateDate rateDateTime) {
+        this.currencyFrom = baseCurrency;
+        this.currencyTo = currency;
+        this.sellRate = sellRate;
+        this.buyRate = buyRate;
+        this.rateDateTime = rateDateTime;
     }
 
-    public Currency getBaseCurrency() {
-        return baseCurrency;
+    public ExchangeRate() {
+
     }
 
-    public void setBaseCurrency(Currency baseCurrency) {
-        this.baseCurrency = baseCurrency;
+    public Currency getCurrencyFrom() {
+        return currencyFrom;
     }
 
-    public Date getDateTime() {
-        return dateTime;
+    public void setCurrencyFrom(Currency currencyFrom) {
+        this.currencyFrom = currencyFrom;
     }
 
-    public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime;
+    public RateDate getDateTime() {
+        return rateDateTime;
     }
 
-    public Currency getCurrency() {
-        return currency;
+    public void setDateTime(RateDate rateDateTime) {
+        this.rateDateTime = rateDateTime;
     }
 
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
+    public Currency getCurrencyTo() {
+        return currencyTo;
     }
 
-    public float getResultValue() {
-        return resultValue;
+    public void setCurrencyTo(Currency currencyTo) {
+        this.currencyTo = currencyTo;
     }
 
-    public void setResultValue(float resultValue) {
-        this.resultValue = resultValue;
+    public float getSellRate() {
+        return sellRate;
+    }
+
+    public void setSellRate(float sellRate) {
+        this.sellRate = sellRate;
+    }
+
+    public float getBuyRate() {
+        return buyRate;
+    }
+
+    public void setBuyRate(float buyRate) {
+        this.buyRate = buyRate;
+    }
+
+    @Override
+    public String toString() {
+        return "ExchangeRate{" +
+                "baseCurrency=" + currencyFrom +
+                ", currency=" + currencyTo +
+                ", sellRate=" + sellRate +
+                ", buyRate=" + buyRate +
+                ", rateDateTime=" + rateDateTime +
+                '}';
     }
 }
