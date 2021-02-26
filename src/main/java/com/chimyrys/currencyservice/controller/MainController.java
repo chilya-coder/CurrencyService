@@ -1,22 +1,12 @@
 package com.chimyrys.currencyservice.controller;
 
 import com.chimyrys.currencyservice.model.Currency;
-import com.chimyrys.currencyservice.model.Date;
+import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import com.chimyrys.currencyservice.service.api.SaveInfoService;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
 
 @RestController
 public class MainController {
@@ -34,29 +24,21 @@ public class MainController {
 
     @RequestMapping("/privatbank/getcurrency")
     @GetMapping
-    public void getCurrencyFromPrivatBank(String date, Currency currency) {
-        privatbankCurrencyService.getCurrency(new Date(date), currency);
-    }
-
-    @RequestMapping(value="/qwerty", method=RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public ExchangeRate foo() {
-        return new ExchangeRate(Currency.UAH, Currency.USD, 25, new Date("2020.01.01"));
+    public void getCurrencyFromPrivatBank(String date, Currency currencyFrom, Currency currencyTo) {
+        privatbankCurrencyService.getCurrency(new RateDate(date), currencyFrom, currencyTo);
     }
 
     @RequestMapping("/monobank/getcurrency")
     @GetMapping
-    public String mono() {
-        String http = "https://api.monobank.ua/bank/currency";
-        HttpClient httpClient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(http);
-        HttpResponse httpResponse = null;
-        try {
-            httpResponse = httpClient.execute(httpGet);
-            return EntityUtils.toString(httpResponse.getEntity());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "oops";
+    public ExchangeRate getCurrencyFromMonoBank(@RequestParam String date,
+                                        @RequestParam String currencyFrom,
+                                        @RequestParam String currencyTo) {
+        return monobankCurrencyService.getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
     }
+    @RequestMapping(value="/qwerty", method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public ExchangeRate foo() {
+        return new ExchangeRate(Currency.UAH, Currency.USD, 25, 26, new RateDate("2020.01.01"));
+    }
+
 }
