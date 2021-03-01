@@ -1,5 +1,4 @@
 package com.chimyrys.currencyservice.model;
-import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Objects;
 
@@ -82,10 +81,26 @@ public class RateDate {
         return Objects.hash(day, month, year);
     }
 
+    public boolean isBefore(RateDate rateDate) {
+        if (rateDate.getYear() != getYear()) {
+            return rateDate.getYear() > getYear();
+        }
+        if (rateDate.getMonth() != getMonth()) {
+            return rateDate.getMonth() > getMonth();
+        }
+        if (rateDate.getDay() != getDay()) {
+            return rateDate.getDay() > getDay();
+        }
+        return false;
+    }
+    public boolean isAfter(RateDate rateDate) {
+        return  !isBefore(rateDate) && !equals(rateDate);
+    }
     public static void main(String[] args) {
-        RateDate rateDate = RateDate.setDate(1622376730);
-        RateDate rateDate1 = RateDate.setDate(1614204606);
-        System.out.println(rateDate1);
-
+        RateDate rateDate = new RateDate("2002.06.20");
+        RateDate rateDate1 = new RateDate("2002.06.20");
+        System.out.println(rateDate + " " + rateDate1);
+        System.out.println(rateDate.isBefore(rateDate1));
+        System.out.println(rateDate.isAfter(rateDate1));
     }
 }
