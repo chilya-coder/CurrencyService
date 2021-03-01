@@ -18,7 +18,7 @@ public class JsonToMonoExchangeRateResponse implements Converter<String, MonoBan
         try {
             return new MonoBankExchangeRateResponse(new ObjectMapper().readValue(s, new TypeReference<List<MonobankExchangeRate>>() {}));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            System.out.println("Can't convert");
         }
         return null;
     }
