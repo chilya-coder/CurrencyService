@@ -6,7 +6,10 @@ import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import com.chimyrys.currencyservice.service.api.SaveInfoService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.crypto.Cipher;
 
 @RestController
 public class MainController {
@@ -30,15 +33,23 @@ public class MainController {
 
     @RequestMapping("/monobank/getcurrency")
     @GetMapping
-    public ExchangeRate getCurrencyFromMonoBank(@RequestParam String date,
-                                        @RequestParam String currencyFrom,
-                                        @RequestParam String currencyTo) {
-        return monobankCurrencyService.getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+    public ResponseEntity<ExchangeRate> getCurrencyFromMonoBank(@RequestParam String date,
+                                                               @RequestParam String currencyFrom,
+                                                               @RequestParam String currencyTo) {
+        ExchangeRate monoResponse = monobankCurrencyService
+                .getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+        if (monoResponse != null) {
+            return  new ResponseEntity<>(monoResponse, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(monoResponse, HttpStatus.NOT_FOUND);
+        }
     }
-    @RequestMapping(value="/qwerty", method=RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public ExchangeRate foo() {
-        return new ExchangeRate(Currency.UAH, Currency.USD, 25, 26, new RateDate("2020.01.01"));
+    @RequestMapping(value="/monobank/getbestcurrency/month", method=RequestMethod.GET)
+    @GetMapping
+    public ExchangeRate smthtotest(@RequestParam String currencyFrom,
+                                   @RequestParam String currencyTo) {
+        ExchangeRate monoResponse = monobankCurrencyService.getBestCurrencyForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+        return monoResponse;
     }
 
 }
