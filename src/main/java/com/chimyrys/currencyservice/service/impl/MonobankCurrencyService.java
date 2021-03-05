@@ -10,14 +10,15 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;geimport java.time.Instant;
-import java.time.LocalDateTime;
+import java.io.IOException;
+import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 /**
  * Service impl that manages:
@@ -25,11 +26,15 @@ import java.util.stream.Stream;
  * - ....
  */
 @Service
+@PropertySource("classpath:/application.properties")
 public class MonobankCurrencyService implements CurrencyService {
+    @Value(value = "${monobank.id}")
     private int id;
-    private String key;
+    @Value(value = "${monobank.name}")
+    private String name;
+    @Value(value = "${monobank.url}")
     private String url;
-    private ConversionService conversionService;
+    private final ConversionService conversionService;
 
     public MonobankCurrencyService(ConversionService conversionService) {
         this.conversionService = conversionService;
@@ -43,7 +48,7 @@ public class MonobankCurrencyService implements CurrencyService {
             return null;
         }
             try {
-                return Stream.of(monoBankExchangeRateResponse.getMonobankExchangeRateList())
+                return monoBankExchangeRateResponse.getMonobankExchangeRateList().stream()
                         .map(monobankExchangeRates -> conversionService.convert(monobankExchangeRates, ExchangeRate.class))
                         .filter(Objects::nonNull)
                         .filter(exchangeRate -> exchangeRate.getDateTime().equals(rateDate))
@@ -56,34 +61,31 @@ public class MonobankCurrencyService implements CurrencyService {
     }
 
     @Override
-    public ExchangeRate getBestCurrencyForMonth(Currency currencyFrom, Currency currencyTo) {
+    public ExchangeRate getBestBuyRateForMonth(Currency currencyFrom, Currency currencyTo) {
         String response = getResponseBodyFromBank();
         MonoBankExchangeRateResponse monoBankExchangeRateResponse = conversionService.convert(response, MonoBankExchangeRateResponse.class);
         if (monoBankExchangeRateResponse == null) {
             return null;
         }
         RateDate currentRateDate = RateDate.setDate(Instant.now().getEpochSecond());
-        System.out.println(currentRateDate);
-       /* try {
-            return Stream.of(monoBankExchangeRateResponse.getMonobankExchangeRateList())
-                    .map(monobankExchangeRates -> conversionService.convert(monobankExchangeRates, ExchangeRate.class))
-                    .filter(Objects::nonNull)
-                    .filter(exchangeRate -> exchangeRate.ge)
+        try {
+             return monoBankExchangeRateResponse.getMonobankExchangeRateList().stream()
+                     .map(monobankExchangeRates -> conversionService.convert(monobankExchangeRates, ExchangeRate.class))
+                     .filter(Objects::nonNull)
+                     .filter(exchangeRate -> currencyTo.equals(exchangeRate.getCurrencyTo()))
+                     .filter(exchangeRate -> currencyFrom.equals(exchangeRate.getCurrencyFrom()))
+                     .filter(exchangeRate -> exchangeRate.getDateTime().getYear() == currentRateDate.getYear())
+                     .filter(exchangeRate -> exchangeRate.getDateTime().getMonth() == currentRateDate.getMonth())
+                     .min((exchangeRate1, exchangeRate2) -> Float.compare(exchangeRate1.getBuyRate(), exchangeRate2.getBuyRate()))
+                     .orElseThrow();
         } catch (NoSuchElementException e) {
             return null;
-        }*/
-        return null;
-    }
-
-    @Override
-    public ExchangeRate getBestCurrencyForWeek(Currency currencyFrom, Currency currencyTo) {
-        return null;
+        }
     }
 
     private String getResponseBodyFromBank() {
-        String http = "https://api.monobank.ua/bank/currency";
         HttpClient httpClient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(http);
+        HttpGet httpGet = new HttpGet(url);
         HttpResponse httpResponse = null;
         String json = null;
         try {
@@ -97,6 +99,11 @@ public class MonobankCurrencyService implements CurrencyService {
 
     @Override
     public int getId() {
-        return 0;
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

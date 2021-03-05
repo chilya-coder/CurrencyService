@@ -1,7 +1,5 @@
 package com.chimyrys.currencyservice.model;
 
-import org.springframework.beans.propertyeditors.CurrencyEditor;
-
 /**
  * Class that describes model of currency.
  * Consists of values of RUB/USD/EUR/UAH

@@ -61,11 +61,7 @@ public class RateDate {
 
     @Override
     public String toString() {
-        return "RateDate{" +
-                "day=" + day +
-                ", month=" + month +
-                ", year=" + year +
-                '}';
+        return getYear() + "." + getMonth() + "." + getDay();
     }
 
     @Override

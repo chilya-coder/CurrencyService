@@ -4,9 +4,12 @@ import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.model.ExchangeRate;
 
+/**
+ * Interface for all banks services
+ */
 public interface CurrencyService {
-    public ExchangeRate getCurrency(RateDate rateDate, Currency currencyFrom, Currency currencyTo);
-    public ExchangeRate getBestCurrency(RateDate rateDate, Currency currencyFrom, Currency currencyTo);
-    public ExchangeRate getBestCurrencyForWeek(Currency currencyFrom, Currency currencyTo);
-    public int getId();
+    ExchangeRate getCurrency(RateDate rateDate, Currency currencyFrom, Currency currencyTo);
+    ExchangeRate getBestBuyRateForMonth(Currency currencyFrom, Currency currencyTo);
+    int getId();
+    String getName();
 }

@@ -5,11 +5,14 @@ import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import com.chimyrys.currencyservice.service.api.SaveInfoService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.crypto.Cipher;
+import java.io.ByteArrayInputStream;
 
 @RestController
 public class MainController {
@@ -44,12 +47,30 @@ public class MainController {
             return new ResponseEntity<>(monoResponse, HttpStatus.NOT_FOUND);
         }
     }
-    @RequestMapping(value="/monobank/getbestcurrency/month", method=RequestMethod.GET)
+    @RequestMapping(value="/monobank/getbestcurrency/month")
     @GetMapping
-    public ExchangeRate smthtotest(@RequestParam String currencyFrom,
+    public ExchangeRate bestCurrencyMonth(@RequestParam String currencyFrom,
                                    @RequestParam String currencyTo) {
-        ExchangeRate monoResponse = monobankCurrencyService.getBestCurrencyForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+        ExchangeRate monoResponse = monobankCurrencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
         return monoResponse;
+    }
+    @RequestMapping(value="/saveExchangeRateToDoc")
+    @GetMapping
+    public ResponseEntity<InputStreamResource> getDoc(@RequestParam String currencyFrom,
+                                                      @RequestParam String currencyTo,
+                                                      @RequestParam String date,
+                                                      @RequestParam String api_id) {
+        byte[] doc = saveInfoService.saveExchangeRate(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo),
+                new RateDate(date), Integer.parseInt(api_id));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("attachment", "ExchangeRateWordFile.docx");
+        headers.setContentType(new MediaType("application", "vnd.openxmlformats-officedocument.wordprocessingml.document"));
+        headers.setContentLength(doc.length);
+        InputStreamResource inputStreamResource = new InputStreamResource
+                (new ByteArrayInputStream(doc));
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(inputStreamResource);
     }
 
 }

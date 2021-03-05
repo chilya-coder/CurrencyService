@@ -17,9 +17,11 @@ import java.io.IOException;
 @Service
 @PropertySource("classpath:/application.properties")
 public class PrivatbankCurrencyService implements CurrencyService {
-    @Value(value = "${api.key}")
+    @Value(value = "${privat.id}")
     private int id;
-    private String key;
+    @Value(value = "${privat.name}")
+    private String name;
+    @Value(value = "https://api.privatbank.ua/p24api/exchange_rates?json")
     private String url;
     @Override
     public ExchangeRate getCurrency(RateDate rateDate, Currency currencyFrom, Currency currencyTo) {
@@ -40,17 +42,17 @@ public class PrivatbankCurrencyService implements CurrencyService {
     }
 
     @Override
-    public ExchangeRate getBestCurrency(RateDate rateDate, Currency currencyFrom, Currency currencyTo) {
-        return null;
-    }
-
-    @Override
-    public ExchangeRate getBestCurrencyForWeek(Currency currencyFrom, Currency currencyTo) {
+    public ExchangeRate getBestBuyRateForMonth(Currency currencyFrom, Currency currencyTo) {
         return null;
     }
 
     @Override
     public int getId() {
-        return 0;
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

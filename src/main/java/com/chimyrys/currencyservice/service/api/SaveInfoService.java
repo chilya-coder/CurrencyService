@@ -1,9 +1,19 @@
 package com.chimyrys.currencyservice.service.api;
 
 import com.chimyrys.currencyservice.model.Currency;
+import com.chimyrys.currencyservice.model.RateDate;
 
-import java.io.File;
-
+/**
+ * Interface for saving doc files
+ */
 public interface SaveInfoService {
-    File saveBestExchangeRate(String date, Currency currency, int currencyServiceId);
+    /**
+     * Method
+     * @param currencyFrom
+     * @param currencyTo
+     * @param rateDate
+     * @param currencyServiceId
+     * @return
+     */
+    byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, RateDate rateDate, int currencyServiceId);
 }
