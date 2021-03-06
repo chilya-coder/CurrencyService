@@ -13,8 +13,8 @@ public class MonoExchangeRateToExchangeRate implements Converter<MonobankExchang
 
     @Override
     public ExchangeRate convert(MonobankExchangeRate monobankExchangeRate) {
-        return new ExchangeRate(Currency.DEFAULT_INSTANCE.getValueFromId(monobankExchangeRate.getCurrencyCodeA()),
-                Currency.DEFAULT_INSTANCE.getValueFromId(monobankExchangeRate.getCurrencyCodeB()),
+        return new ExchangeRate(Currency.getValueFromId(monobankExchangeRate.getCurrencyCodeA()),
+                Currency.getValueFromId(monobankExchangeRate.getCurrencyCodeB()),
                 monobankExchangeRate.getRateSell(),
                 monobankExchangeRate.getRateBuy(),
                 RateDate.setDate(monobankExchangeRate.getDate()));

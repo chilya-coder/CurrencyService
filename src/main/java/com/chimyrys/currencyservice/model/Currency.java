@@ -9,8 +9,7 @@ public enum Currency {
     RUB("RUB", 643),
     USD("USD", 840),
     EUR("EUR", 978),
-    UAH("UAH", 980),
-    DEFAULT_INSTANCE("",-1);
+    UAH("UAH", 980);
     private final String value;
     private final int id;
     Currency(String value, int id) {
@@ -26,7 +25,7 @@ public enum Currency {
         return id;
     }
 
-    public Currency getValueFromId(int id) {
+    public static Currency getValueFromId(int id) {
         for (Currency c : values()) {
             if (c.id == id) {
                 return c;
