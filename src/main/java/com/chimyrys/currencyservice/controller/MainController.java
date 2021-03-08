@@ -30,8 +30,10 @@ public class MainController {
 
     @RequestMapping("/privatbank/getcurrency")
     @GetMapping
-    public void getCurrencyFromPrivatBank(String date, Currency currencyFrom, Currency currencyTo) {
-        privatbankCurrencyService.getCurrency(new RateDate(date), currencyFrom, currencyTo);
+    public void getCurrencyFromPrivatBank(@RequestParam String date,
+                                          @RequestParam String currencyFrom,
+                                          @RequestParam String currencyTo) {
+        privatbankCurrencyService.getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
     }
 
     @RequestMapping("/monobank/getcurrency")
