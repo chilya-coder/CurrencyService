@@ -3,7 +3,6 @@ package com.chimyrys.currencyservice.service.impl;
 import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.model.PrivatBankExchangeRateResponse;
-import com.chimyrys.currencyservice.model.PrivatbankExchangeRate;
 import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import org.apache.http.HttpResponse;
@@ -39,17 +38,29 @@ public class PrivatbankCurrencyService implements CurrencyService {
     @Override
     public ExchangeRate getCurrency(RateDate rateDate, Currency currencyFrom, Currency currencyTo) {
         String response = getResponseBodyFromBank(rateDate);
-        System.out.println(response);
         PrivatBankExchangeRateResponse privatBankExchangeRateResponse = conversionService.convert(response, PrivatBankExchangeRateResponse.class);
         if (privatBankExchangeRateResponse == null) {
             return null;
         }
+
         try {
-            List<PrivatbankExchangeRate> privatbankExchangeRateList = conversionService.convert(privatBankExchangeRateResponse, List.class);
+            List<ExchangeRate> privatbankExchangeRateList = conversionService.convert(privatBankExchangeRateResponse, List.class);
+            System.out.println(privatbankExchangeRateList);
+            for (ExchangeRate r:privatbankExchangeRateList
+                 ) {
+                if (r.getDateTime().equals(rateDate)
+                    && r.getCurrencyFrom().equals(currencyFrom)
+                    && r.getCurrencyTo().equals(currencyTo)) {
+                    return r;
+                }
+            }
+            return privatbankExchangeRateList.stream().filter(privatbankExchangeRate -> privatbankExchangeRate.getDateTime().equals(rateDate))
+                    .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyFrom().equals(currencyFrom))
+                    .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyTo().equals(currencyTo))
+                    .iterator().next();
         } catch (NoSuchElementException e) {
             return null;
         }
-        return null;
     }
 
     @Override

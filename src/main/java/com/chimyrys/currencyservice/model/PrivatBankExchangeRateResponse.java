@@ -2,6 +2,9 @@ package com.chimyrys.currencyservice.model;
 
 import java.util.List;
 
+/**
+ * Class that represents model of PB object from json response
+ */
 public class PrivatBankExchangeRateResponse {
     private String date;
     private String bank;
@@ -20,8 +23,17 @@ public class PrivatBankExchangeRateResponse {
         this.exchangeRate = exchangeRate;
     }
 
+    /**
+     * Method getDate() parse string of date from PB json
+     * from "d.m.yyyy" and returns it in format "yyyy.m.d"
+     * @return String date
+     */
     public String getDate() {
-        return date;
+        String[] values = date.split("\\.");
+        int year = Integer.parseInt(values[2]);
+        int month = Integer.parseInt(values[1]);
+        int day = Integer.parseInt(values[0]);
+        return year + "." + month + "." + day;
     }
 
     public void setDate(String date) {

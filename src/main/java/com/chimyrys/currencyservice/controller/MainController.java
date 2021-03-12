@@ -10,7 +10,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
 
@@ -30,10 +33,16 @@ public class MainController {
 
     @RequestMapping("/privatbank/getcurrency")
     @GetMapping
-    public void getCurrencyFromPrivatBank(@RequestParam String date,
-                                          @RequestParam String currencyFrom,
-                                          @RequestParam String currencyTo) {
-        privatbankCurrencyService.getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+    public ResponseEntity<ExchangeRate> getCurrencyFromPrivatBank(@RequestParam String date,
+                                                                  @RequestParam String currencyFrom,
+                                                                  @RequestParam String currencyTo) {
+        ExchangeRate privatResponse = privatbankCurrencyService
+                .getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+        if (privatResponse != null) {
+            return  new ResponseEntity<>(privatResponse, HttpStatus.OK);
+        } else {
+            return  new ResponseEntity<>(privatResponse, HttpStatus.NOT_FOUND);
+        }
     }
 
     @RequestMapping("/monobank/getcurrency")

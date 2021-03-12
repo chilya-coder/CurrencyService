@@ -35,13 +35,6 @@ public class ExchangeRate {
         this.currencyFrom = currencyFrom;
     }
 
-    public RateDate getDateTime() {
-        return rateDateTime;
-    }
-
-    public void setDateTime(RateDate rateDateTime) {
-        this.rateDateTime = rateDateTime;
-    }
 
     public Currency getCurrencyTo() {
         return currencyTo;
@@ -65,6 +58,14 @@ public class ExchangeRate {
 
     public void setBuyRate(float buyRate) {
         this.buyRate = buyRate;
+    }
+
+    public RateDate getDateTime() {
+        return rateDateTime;
+    }
+
+    public void setDateTime(RateDate rateDateTime) {
+        this.rateDateTime = rateDateTime;
     }
 
     @Override

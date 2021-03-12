@@ -7,18 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrivatExchangeRateToExchangeRate implements Converter<PrivatBankExchangeRateResponse, List<ExchangeRate>> {
-
     @Override
     public List<ExchangeRate> convert(PrivatBankExchangeRateResponse privatBankExchangeRateResponse) {
         List<ExchangeRate> list = new ArrayList<>();
         Currency baseCurrency = Currency.valueOf(privatBankExchangeRateResponse.getBaseCurrencyLit());
         RateDate rateDate = new RateDate(privatBankExchangeRateResponse.getDate());
         for (PrivatbankExchangeRate privatbankExchangeRate: privatBankExchangeRateResponse.getExchangeRate()) {
-            Currency currency = Currency.valueOf(privatbankExchangeRate.getCurrency());
-            list.add(new ExchangeRate(baseCurrency,currency,
-                    privatbankExchangeRate.getSaleRate(),
-                    privatbankExchangeRate.getPurchaseRate(),
-                    rateDate));
+            if (privatbankExchangeRate.getCurrency() == null) {
+                continue;
+            }
+            try {
+                Currency currency = Currency.valueOf(privatbankExchangeRate.getCurrency());
+                list.add(new ExchangeRate(baseCurrency,currency,
+                        privatbankExchangeRate.getSaleRate(),
+                        privatbankExchangeRate.getPurchaseRate(),
+                        rateDate));
+            } catch (IllegalArgumentException i) {
+            }
+
         }
         return list;
     }
