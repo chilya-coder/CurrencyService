@@ -45,15 +45,6 @@ public class PrivatbankCurrencyService implements CurrencyService {
 
         try {
             List<ExchangeRate> privatbankExchangeRateList = conversionService.convert(privatBankExchangeRateResponse, List.class);
-            System.out.println(privatbankExchangeRateList);
-            for (ExchangeRate r:privatbankExchangeRateList
-                 ) {
-                if (r.getDateTime().equals(rateDate)
-                    && r.getCurrencyFrom().equals(currencyFrom)
-                    && r.getCurrencyTo().equals(currencyTo)) {
-                    return r;
-                }
-            }
             return privatbankExchangeRateList.stream().filter(privatbankExchangeRate -> privatbankExchangeRate.getDateTime().equals(rateDate))
                     .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyFrom().equals(currencyFrom))
                     .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyTo().equals(currencyTo))
