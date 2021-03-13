@@ -20,10 +20,10 @@ import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-/**
- * Service impl that manages:
- * - getting currency A to B for specific date
- * - ....
+ /**
+ * Service that give us functionality of MonoBank API for:
+ * 1) getting converted currency for specific day
+ * 2) getting best (with minimum buy rate) currency for month
  */
 @Service
 @PropertySource("classpath:/application.properties")
