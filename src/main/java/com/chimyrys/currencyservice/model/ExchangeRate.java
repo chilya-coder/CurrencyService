@@ -23,6 +23,12 @@ public class ExchangeRate {
         this.rateDateTime = rateDateTime;
     }
 
+    public ExchangeRate(float sellRate, float buyRate, RateDate rateDateTime) {
+        this.sellRate = sellRate;
+        this.buyRate = buyRate;
+        this.rateDateTime = rateDateTime;
+    }
+
     public ExchangeRate() {
 
     }
