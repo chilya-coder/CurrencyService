@@ -18,7 +18,7 @@ public class PrivatExchangeRateToExchangeRate implements Converter<PrivatBankExc
             }
             try {
                 Currency currency = Currency.valueOf(privatbankExchangeRate.getCurrency());
-                list.add(new ExchangeRate(baseCurrency,currency,
+                list.add(new ExchangeRate(currency,baseCurrency,
                         privatbankExchangeRate.getSaleRate(),
                         privatbankExchangeRate.getPurchaseRate(),
                         rateDate));

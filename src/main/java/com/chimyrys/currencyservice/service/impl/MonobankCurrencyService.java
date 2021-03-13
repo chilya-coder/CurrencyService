@@ -67,7 +67,7 @@ public class MonobankCurrencyService implements CurrencyService {
         if (monoBankExchangeRateResponse == null) {
             return null;
         }
-        RateDate currentRateDate = RateDate.setDate(Instant.now().getEpochSecond());
+        RateDate currentRateDate = RateDate.createDateFromSeconds(Instant.now().getEpochSecond());
         try {
              return monoBankExchangeRateResponse.getMonobankExchangeRateList().stream()
                      .map(monobankExchangeRates -> conversionService.convert(monobankExchangeRates, ExchangeRate.class))

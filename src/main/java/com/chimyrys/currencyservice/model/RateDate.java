@@ -1,5 +1,7 @@
 package com.chimyrys.currencyservice.model;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -16,6 +18,17 @@ public class RateDate {
         year = Integer.parseInt(values[0]);
         month = Integer.parseInt(values[1]);
         day = Integer.parseInt(values[2]);
+    }
+    public RateDate(String date, String format) {
+        String[] dates = date.split("\\.");
+        String[] formats = format.split("\\.");
+        Map<String, String> map = new HashMap<>();
+        for(int i = 0; i < dates.length; i++) {
+            map.put(formats[i], dates[i]);
+        }
+        year = Integer.parseInt(map.get("yyyy"));
+        month = Integer.parseInt(map.get("mm"));
+        day = Integer.parseInt(map.get("dd"));
     }
 
     public RateDate() {
@@ -50,9 +63,18 @@ public class RateDate {
      * @param timestamp
      * @return RateDate
      */
-    public static RateDate setDate(long timestamp) {
+    public static RateDate createDateFromSeconds(long timestamp) {
+        return createDateFromMillis(timestamp * 1000);
+
+    }
+    /**
+     * Method that parses UNIX timestamp millis to "yyyy.mm.dd format"
+     * @param timestamp
+     * @return RateDate
+     */
+    public static RateDate createDateFromMillis(long timestamp) {
         Calendar mydate = Calendar.getInstance();
-        mydate.setTimeInMillis(timestamp*1000);
+        mydate.setTimeInMillis(timestamp);
         return new RateDate(mydate.get(Calendar.YEAR) +
                 "." + (mydate.get(Calendar.MONTH) + 1) +
                 "."  + (mydate.get(Calendar.DAY_OF_MONTH)));
@@ -91,12 +113,5 @@ public class RateDate {
     }
     public boolean isAfter(RateDate rateDate) {
         return  !isBefore(rateDate) && !equals(rateDate);
-    }
-    public static void main(String[] args) {
-        RateDate rateDate = new RateDate("2002.06.20");
-        RateDate rateDate1 = new RateDate("2002.06.20");
-        System.out.println(rateDate + " " + rateDate1);
-        System.out.println(rateDate.isBefore(rateDate1));
-        System.out.println(rateDate.isAfter(rateDate1));
     }
 }

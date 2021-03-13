@@ -1,10 +1,11 @@
 package com.chimyrys.currencyservice.controller;
 
 import com.chimyrys.currencyservice.model.Currency;
-import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.model.ExchangeRate;
+import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import com.chimyrys.currencyservice.service.api.SaveInfoService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,18 +17,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 @RestController
 public class MainController {
     private final CurrencyService monobankCurrencyService;
-    private CurrencyService privatbankCurrencyService;
-    private SaveInfoService saveInfoService;
+    private final CurrencyService privatbankCurrencyService;
+    private final SaveInfoService saveInfoService;
+    private final List<CurrencyService> currencyServices;
+    @Value("${controller.numberOfThreads}")
+    private int numberOfThreads;
 
 
-    public MainController(CurrencyService monobankCurrencyService, CurrencyService privatbankCurrencyService, SaveInfoService saveInfoService) {
+    public MainController(CurrencyService monobankCurrencyService, CurrencyService privatbankCurrencyService, SaveInfoService saveInfoService, List<CurrencyService> currencyServices) {
         this.monobankCurrencyService = monobankCurrencyService;
         this.privatbankCurrencyService = privatbankCurrencyService;
         this.saveInfoService = saveInfoService;
+        this.currencyServices = currencyServices;
     }
 
 
@@ -62,15 +70,13 @@ public class MainController {
     @GetMapping
     public ExchangeRate bestCurrencyMonthMonoBank(@RequestParam String currencyFrom,
                                                   @RequestParam String currencyTo) {
-        ExchangeRate monoResponse = monobankCurrencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
-        return monoResponse;
+        return monobankCurrencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
     }
     @RequestMapping(value="/privatbank/getbestcurrency/month")
     @GetMapping
     public ExchangeRate bestCurrencyMonthPrivatBank(@RequestParam String currencyFrom,
                                                   @RequestParam String currencyTo) {
-        ExchangeRate privatResponse = privatbankCurrencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
-        return privatResponse;
+        return privatbankCurrencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
     }
     @RequestMapping(value="/saveExchangeRateToDoc")
     @GetMapping
@@ -89,6 +95,30 @@ public class MainController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(inputStreamResource);
+    }
+    @RequestMapping(value="/getAllExchangeRates")
+    @GetMapping
+    public ResponseEntity<List<ExchangeRate>> getAllExchangeRates(@RequestParam String currencyFrom,
+                                                      @RequestParam String currencyTo,
+                                                      @RequestParam String date) {
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+        ExecutorCompletionService<ExchangeRate> completionService = new ExecutorCompletionService<>(executorService);
+        List<ExchangeRate> list = new ArrayList<>();
+        for (CurrencyService currencyService: currencyServices) {
+            Future<ExchangeRate> submit = null;
+            try {
+                submit = completionService.submit(() -> currencyService.getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo)));
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            try {
+                assert submit != null;
+                list.add(submit.get());
+            } catch (InterruptedException | ExecutionException | NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
 }

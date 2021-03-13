@@ -1,6 +1,5 @@
 package com.chimyrys.currencyservice.config;
 
-import com.chimyrys.currencyservice.model.PrivatbankArchiveExchangeRateResponse;
 import com.chimyrys.currencyservice.model.converter.*;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;

@@ -6,10 +6,10 @@ package com.chimyrys.currencyservice.model;
  */
 public class PrivateArchiveExchangeRate {
     private long date;
-    private long sellPrice;
-    private long buyPrice;
+    private float sellPrice;
+    private float buyPrice;
 
-    public PrivateArchiveExchangeRate(long date, long sellPrice, long buyPrice) {
+    public PrivateArchiveExchangeRate(long date, float sellPrice, float buyPrice) {
         this.date = date;
         this.sellPrice = sellPrice;
         this.buyPrice = buyPrice;
@@ -26,19 +26,19 @@ public class PrivateArchiveExchangeRate {
         this.date = date;
     }
 
-    public long getSellPrice() {
+    public float getSellPrice() {
         return sellPrice;
     }
 
-    public void setSellPrice(long sellPrice) {
+    public void setSellPrice(float sellPrice) {
         this.sellPrice = sellPrice;
     }
 
-    public long getBuyPrice() {
+    public float getBuyPrice() {
         return buyPrice;
     }
 
-    public void setBuyPrice(long buyPrice) {
+    public void setBuyPrice(float buyPrice) {
         this.buyPrice = buyPrice;
     }
 
