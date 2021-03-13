@@ -1,9 +1,7 @@
 package com.chimyrys.currencyservice.config;
 
-import com.chimyrys.currencyservice.model.converter.JsonToMonoExchangeRateResponse;
-import com.chimyrys.currencyservice.model.converter.JsonToPrivatExchangeRateResponse;
-import com.chimyrys.currencyservice.model.converter.MonoExchangeRateToExchangeRate;
-import com.chimyrys.currencyservice.model.converter.PrivatExchangeRateToExchangeRate;
+import com.chimyrys.currencyservice.model.PrivatbankArchiveExchangeRateResponse;
+import com.chimyrys.currencyservice.model.converter.*;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
@@ -29,5 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addConverter(new MonoExchangeRateToExchangeRate());
         registry.addConverter(new JsonToPrivatExchangeRateResponse());
         registry.addConverter(new PrivatExchangeRateToExchangeRate());
+        registry.addConverter(new JsonToPrivateArchiveExchangeRate());
+        registry.addConverter(new PrivatArchiveExchangeRateToExchangeRate());
     }
 }

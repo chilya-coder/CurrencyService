@@ -60,10 +60,17 @@ public class MainController {
     }
     @RequestMapping(value="/monobank/getbestcurrency/month")
     @GetMapping
-    public ExchangeRate bestCurrencyMonth(@RequestParam String currencyFrom,
-                                   @RequestParam String currencyTo) {
+    public ExchangeRate bestCurrencyMonthMonoBank(@RequestParam String currencyFrom,
+                                                  @RequestParam String currencyTo) {
         ExchangeRate monoResponse = monobankCurrencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
         return monoResponse;
+    }
+    @RequestMapping(value="/privatbank/getbestcurrency/month")
+    @GetMapping
+    public ExchangeRate bestCurrencyMonthPrivatBank(@RequestParam String currencyFrom,
+                                                  @RequestParam String currencyTo) {
+        ExchangeRate privatResponse = privatbankCurrencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+        return privatResponse;
     }
     @RequestMapping(value="/saveExchangeRateToDoc")
     @GetMapping
