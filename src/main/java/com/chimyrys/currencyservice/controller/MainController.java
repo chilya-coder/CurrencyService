@@ -5,6 +5,7 @@ import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import com.chimyrys.currencyservice.service.api.SaveInfoService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,7 @@ public class MainController {
     private final List<CurrencyService> currencyServices;
     @Value("${controller.numberOfThreads}")
     private int numberOfThreads;
+    private final static Logger logger = Logger.getLogger(MainController.class);
 
 
     public MainController(CurrencyService monobankCurrencyService, CurrencyService privatbankCurrencyService, SaveInfoService saveInfoService, List<CurrencyService> currencyServices) {
@@ -44,12 +46,14 @@ public class MainController {
     public ResponseEntity<ExchangeRate> getCurrencyFromPrivatBank(@RequestParam String date,
                                                                   @RequestParam String currencyFrom,
                                                                   @RequestParam String currencyTo) {
+        logger.info("Getting currency from PrivatBank for date=" + date + ","
+        + " currencyFrom=" + currencyFrom + "," + " currencyTo=" + currencyTo);
         ExchangeRate privatResponse = privatbankCurrencyService
                 .getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
         if (privatResponse != null) {
-            return  new ResponseEntity<>(privatResponse, HttpStatus.OK);
+            return new ResponseEntity<>(privatResponse, HttpStatus.OK);
         } else {
-            return  new ResponseEntity<>(privatResponse, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(privatResponse, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -58,6 +62,8 @@ public class MainController {
     public ResponseEntity<ExchangeRate> getCurrencyFromMonoBank(@RequestParam String date,
                                                                @RequestParam String currencyFrom,
                                                                @RequestParam String currencyTo) {
+        logger.info("Getting currency from MonoBank for date=" + date + ","
+                + " currencyFrom=" + currencyFrom + "," + " currencyTo=" + currencyTo);
         ExchangeRate monoResponse = monobankCurrencyService
                 .getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
         if (monoResponse != null) {
@@ -70,12 +76,16 @@ public class MainController {
     @GetMapping
     public ExchangeRate bestCurrencyMonthMonoBank(@RequestParam String currencyFrom,
                                                   @RequestParam String currencyTo) {
+        logger.info("Getting currency from MonoBank for month:"
+                + "currencyFrom=" + currencyFrom + "," + " currencyTo=" + currencyTo);
         return monobankCurrencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
     }
     @RequestMapping(value="/privatbank/getbestcurrency/month")
     @GetMapping
     public ExchangeRate bestCurrencyMonthPrivatBank(@RequestParam String currencyFrom,
                                                   @RequestParam String currencyTo) {
+        logger.info("Getting currency from PribatBank for month:"
+                + "currencyFrom=" + currencyFrom + "," + " currencyTo=" + currencyTo);
         return privatbankCurrencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
     }
     @RequestMapping(value="/saveExchangeRateToDoc")
@@ -84,6 +94,7 @@ public class MainController {
                                                       @RequestParam String currencyTo,
                                                       @RequestParam String date,
                                                       @RequestParam String api_id) {
+        logger.info("Saving info to doc file");
         byte[] doc = saveInfoService.saveExchangeRate(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo),
                 new RateDate(date), Integer.parseInt(api_id));
         HttpHeaders headers = new HttpHeaders();
@@ -101,6 +112,7 @@ public class MainController {
     public ResponseEntity<List<ExchangeRate>> getAllExchangeRates(@RequestParam String currencyFrom,
                                                       @RequestParam String currencyTo,
                                                       @RequestParam String date) {
+        logger.info("Getting all exchange rates from all banks");
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         ExecutorCompletionService<ExchangeRate> completionService = new ExecutorCompletionService<>(executorService);
         List<ExchangeRate> list = new ArrayList<>();
