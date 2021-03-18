@@ -54,8 +54,9 @@ public class MonobankCurrencyService implements CurrencyService {
         logger.debug(env.getProperty("logging.string.covert.json_to_response")
                 + MonoBankExchangeRateResponse.class);
         MonoBankExchangeRateResponse monoBankExchangeRateResponse = conversionService.convert(response, MonoBankExchangeRateResponse.class);
-        if (monoBankExchangeRateResponse == null) {
-            return null;
+        if (Objects.isNull(monoBankExchangeRateResponse)) {
+            logger.error("monoBankExchangeRateResponse is null");
+            throw new NullPointerException();
         }
             try {
                 logger.debug("Converting " + MonoBankExchangeRateResponse.class + " to" +
@@ -63,13 +64,15 @@ public class MonobankCurrencyService implements CurrencyService {
                 return monoBankExchangeRateResponse.getMonobankExchangeRateList().stream()
                         .map(monobankExchangeRates -> conversionService.convert(monobankExchangeRates, ExchangeRate.class))
                         .filter(Objects::nonNull)
+                        .filter(exchangeRate -> exchangeRate.getCurrencyTo() != null)
+                        .filter(exchangeRate -> exchangeRate.getCurrencyFrom() != null)
                         .filter(exchangeRate -> exchangeRate.getDateTime().equals(rateDate))
                         .filter(exchangeRate -> exchangeRate.getCurrencyTo().equals(currencyTo))
                         .filter(exchangeRate -> exchangeRate.getCurrencyFrom().equals(currencyFrom))
                         .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
                         .iterator().next();
             } catch (NoSuchElementException e) {
-                logger.error(env.getProperty("logging.string.no_param") +  "rateDate=" + rateDate.getYear() + "." + rateDate.getMonth()
+                logger.error(env.getProperty("logging.string.no_param") +  "rateDate=" + rateDate.getYear() + "." + rateDate.getMonth() + "."
                 + rateDate.getDay() + ", currencyFrom=" + currencyFrom.getValue() + ", currencyTo=" + currencyTo);
                 return null;
             }
