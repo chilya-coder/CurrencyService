@@ -35,16 +35,10 @@ public class SaveInfoServiceImpl implements SaveInfoService {
      * @param currencyFrom
      * @param currencyTo
      * @param rateDate
-     * @param currencyServiceId
      * @return
      */
     @Override
-    public byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, RateDate rateDate, int currencyServiceId) {
-        logger.debug("Getting bank service due to id:" + currencyServiceId);
-        CurrencyService currencyService = currencyServices.stream()
-                .filter(service -> service.getId() == currencyServiceId)
-                .peek(service -> logger.debug("Result: " + service.getName()))
-                .iterator().next();
+    public byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, RateDate rateDate, CurrencyService currencyService) {
         ExchangeRate exchangeRate = currencyService.getCurrency(rateDate, currencyFrom, currencyTo);
         try {
             logger.debug("Filling info to doc");

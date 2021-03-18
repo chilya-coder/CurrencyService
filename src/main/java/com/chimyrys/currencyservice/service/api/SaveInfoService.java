@@ -12,8 +12,7 @@ public interface SaveInfoService {
      * @param currencyFrom
      * @param currencyTo
      * @param rateDate
-     * @param currencyServiceId
      * @return
      */
-    byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, RateDate rateDate, int currencyServiceId);
+    byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, RateDate rateDate, CurrencyService currencyService);
 }
