@@ -1,7 +1,7 @@
 package com.chimyrys.currencyservice.model.converter;
 
 
-import com.chimyrys.currencyservice.model.PrivatBankExchangeRateResponse;
+import com.chimyrys.currencyservice.model.privatbank.PrivatBankExchangeRateResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;

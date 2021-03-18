@@ -2,7 +2,7 @@ package com.chimyrys.currencyservice.model.converter;
 
 import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
-import com.chimyrys.currencyservice.model.MonobankExchangeRate;
+import com.chimyrys.currencyservice.model.monobank.MonobankExchangeRate;
 import com.chimyrys.currencyservice.model.RateDate;
 import org.springframework.core.convert.converter.Converter;
 

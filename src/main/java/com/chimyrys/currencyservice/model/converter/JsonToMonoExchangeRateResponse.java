@@ -1,7 +1,7 @@
 package com.chimyrys.currencyservice.model.converter;
 
-import com.chimyrys.currencyservice.model.MonoBankExchangeRateResponse;
-import com.chimyrys.currencyservice.model.MonobankExchangeRate;
+import com.chimyrys.currencyservice.model.monobank.MonoBankExchangeRateResponse;
+import com.chimyrys.currencyservice.model.monobank.MonobankExchangeRate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

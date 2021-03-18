@@ -1,4 +1,4 @@
-package com.chimyrys.currencyservice.model;
+package com.chimyrys.currencyservice.model.privatbank;
 
 public class PrivatbankExchangeRate {
     private String baseCurrency;

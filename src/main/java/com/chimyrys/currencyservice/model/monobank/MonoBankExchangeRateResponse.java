@@ -1,4 +1,4 @@
-package com.chimyrys.currencyservice.model;
+package com.chimyrys.currencyservice.model.monobank;
 
 import java.util.List;
 

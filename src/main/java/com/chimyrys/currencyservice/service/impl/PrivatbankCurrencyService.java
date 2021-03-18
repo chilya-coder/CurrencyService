@@ -2,6 +2,8 @@ package com.chimyrys.currencyservice.service.impl;
 
 import com.chimyrys.currencyservice.model.*;
 import com.chimyrys.currencyservice.model.converter.JsonToMonoExchangeRateResponse;
+import com.chimyrys.currencyservice.model.privatbank.PrivatBankExchangeRateResponse;
+import com.chimyrys.currencyservice.model.privatbank.PrivatbankArchiveExchangeRateResponse;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

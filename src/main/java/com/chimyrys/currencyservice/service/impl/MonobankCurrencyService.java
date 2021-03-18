@@ -2,7 +2,7 @@ package com.chimyrys.currencyservice.service.impl;
 
 import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
-import com.chimyrys.currencyservice.model.MonoBankExchangeRateResponse;
+import com.chimyrys.currencyservice.model.monobank.MonoBankExchangeRateResponse;
 import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.model.converter.JsonToMonoExchangeRateResponse;
 import com.chimyrys.currencyservice.service.api.CurrencyService;

@@ -1,4 +1,4 @@
-package com.chimyrys.currencyservice.model;
+package com.chimyrys.currencyservice.model.monobank;
 
 /**
  * Class that consists of json fields of monobank

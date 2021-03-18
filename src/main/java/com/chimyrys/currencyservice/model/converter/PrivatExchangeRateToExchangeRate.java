@@ -1,6 +1,8 @@
 package com.chimyrys.currencyservice.model.converter;
 
 import com.chimyrys.currencyservice.model.*;
+import com.chimyrys.currencyservice.model.privatbank.PrivatBankExchangeRateResponse;
+import com.chimyrys.currencyservice.model.privatbank.PrivatbankExchangeRate;
 import org.apache.log4j.Logger;
 import org.springframework.core.convert.converter.Converter;
 
