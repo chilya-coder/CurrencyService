@@ -31,7 +31,7 @@ import java.util.Objects;
 @Service
 @PropertySource("classpath:/application.properties")
 public class PrivatbankCurrencyService implements CurrencyService {
-    private final static Logger logger = Logger.getLogger(JsonToMonoExchangeRateResponse.class);
+    private final static Logger logger = Logger.getLogger(PrivatbankCurrencyService.class);
     @Value(value = "${privat.id}")
     private int id;
     @Value(value = "${privat.name}")

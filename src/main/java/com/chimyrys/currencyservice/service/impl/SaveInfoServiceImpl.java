@@ -21,7 +21,7 @@ import java.util.List;
 
 @Service
 public class SaveInfoServiceImpl implements SaveInfoService {
-    private final static Logger logger = Logger.getLogger(JsonToMonoExchangeRateResponse.class);
+    private final static Logger logger = Logger.getLogger(SaveInfoServiceImpl.class);
     private final List<CurrencyService> currencyServices;
     private final File template;
 
