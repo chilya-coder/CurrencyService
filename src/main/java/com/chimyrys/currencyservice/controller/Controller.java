@@ -28,6 +28,12 @@ public abstract class Controller {
         this.saveInfoService = saveInfoService;
     }
 
+    /**
+     * @param date
+     * @param currencyFrom can be any currency from Currency enum list
+     * @param currencyTo should be always "UAH"
+     * @return
+     */
     @RequestMapping("/getcurrency")
     @GetMapping
     public ResponseEntity<ExchangeRate> getCurrencyFrom(@RequestParam String date,
@@ -44,6 +50,11 @@ public abstract class Controller {
         }
     }
 
+    /**
+     * @param currencyFrom can be any currency from Currency enum list
+     * @param currencyTo should be always "UAH"
+     * @return
+     */
     @RequestMapping(value = "/getbestcurrency/month")
     @GetMapping
     public ExchangeRate bestCurrencyMonth(@RequestParam String currencyFrom,

@@ -71,8 +71,8 @@ public class PrivatbankCurrencyService implements CurrencyService {
                     .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
                     .iterator().next();
         } catch (NoSuchElementException e) {
-            logger.error(env.getProperty("logging.string.no_param") + rateDate.getYear() + "." + rateDate.getMonth()
-                    + rateDate.getDay() + ", currencyFrom" + currencyFrom.getValue() + ", currencyTo" + currencyTo);
+            logger.error(env.getProperty("logging.string.no_param") + rateDate.getYear() + "." + rateDate.getMonth() + "."
+                    + rateDate.getDay() + ", currencyFrom: " + currencyFrom.getValue() + ", currencyTo: " + currencyTo);
             return null;
         }
     }
