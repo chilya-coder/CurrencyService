@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.ByteArrayInputStream;
 
 @RestController
-public abstract class Controller {
+public abstract class AbstractController {
     protected CurrencyService currencyService;
-    private final static Logger logger = Logger.getLogger(Controller.class);
+    private final static Logger logger = Logger.getLogger(AbstractController.class);
     private final SaveInfoService saveInfoService;
 
-    public Controller(SaveInfoService saveInfoService) {
+    public AbstractController(SaveInfoService saveInfoService) {
         this.saveInfoService = saveInfoService;
     }
 

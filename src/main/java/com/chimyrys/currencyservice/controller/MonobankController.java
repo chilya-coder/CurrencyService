@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/monobank")
-public class MonobankController extends Controller {
+public class MonobankController extends AbstractController {
 
     public MonobankController(CurrencyService monobankCurrencyService, SaveInfoService saveInfoService) {
         super(saveInfoService);

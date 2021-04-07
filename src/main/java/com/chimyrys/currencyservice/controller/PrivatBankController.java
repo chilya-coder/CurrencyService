@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/privatbank")
-public class PrivatBankController extends Controller {
+public class PrivatBankController extends AbstractController {
 
     public PrivatBankController(CurrencyService privatbankCurrencyService, SaveInfoService saveInfoService) {
         super(saveInfoService);
