@@ -39,7 +39,7 @@ public class MonobankCurrencyService implements CurrencyService {
     @Value(value = "${monobank.url}")
     private String url;
     private final ConversionService conversionService;
-    private Environment env;
+    private final Environment env;
 
     public MonobankCurrencyService(ConversionService conversionService, Environment env) {
         this.conversionService = conversionService;
