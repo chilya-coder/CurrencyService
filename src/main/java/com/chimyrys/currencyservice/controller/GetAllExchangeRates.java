@@ -22,7 +22,7 @@ public class GetAllExchangeRates {
     private final List<CurrencyService> currencyServices;
     @Value("${controller.numberOfThreads}")
     private int numberOfThreads;
-    private final static Logger logger = Logger.getLogger(Controller.class);
+    private final static Logger logger = Logger.getLogger(GetAllExchangeRates.class);
 
     public GetAllExchangeRates(List<CurrencyService> currencyServices) {
         this.currencyServices = currencyServices;
