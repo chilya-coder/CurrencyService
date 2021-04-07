@@ -69,7 +69,7 @@ public class MonobankCurrencyService implements CurrencyService {
                         .filter(exchangeRate -> exchangeRate.getCurrencyTo().equals(currencyTo))
                         .filter(exchangeRate -> exchangeRate.getCurrencyFrom().equals(currencyFrom))
                         .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
-                        .iterator().next();
+                        .findAny().orElseThrow();
             } catch (NoSuchElementException e) {
                 logger.error(env.getProperty("logging.string.no_param") +  "rateDate=" + rateDate.getYear() + "." + rateDate.getMonth() + "."
                 + rateDate.getDay() + ", currencyFrom=" + currencyFrom.getValue() + ", currencyTo=" + currencyTo);
