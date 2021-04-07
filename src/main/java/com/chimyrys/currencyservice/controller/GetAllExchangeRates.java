@@ -41,18 +41,17 @@ public class GetAllExchangeRates {
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         ExecutorCompletionService<ExchangeRate> completionService = new ExecutorCompletionService<>(executorService);
         List<ExchangeRate> list = new ArrayList<>();
+        List<Future<ExchangeRate>> futureList = new ArrayList<>();
         for (CurrencyService currencyService: currencyServices) {
-            Future<ExchangeRate> submit = null;
+            futureList.add(completionService.submit(
+                    () -> currencyService.getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo))
+            ));
+        }
+        for(Future<ExchangeRate> future: futureList) {
             try {
-                submit = completionService.submit(() -> currencyService.getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo)));
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-            try {
-                assert submit != null;
-                list.add(submit.get());
-            } catch (InterruptedException | ExecutionException | NullPointerException e) {
-                e.printStackTrace();
+                list.add(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         }
         return new ResponseEntity<>(list, HttpStatus.OK);
