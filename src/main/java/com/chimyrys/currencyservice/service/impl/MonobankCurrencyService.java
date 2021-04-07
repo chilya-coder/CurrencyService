@@ -4,7 +4,6 @@ import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.model.monobank.MonoBankExchangeRateResponse;
 import com.chimyrys.currencyservice.model.RateDate;
-import com.chimyrys.currencyservice.model.converter.JsonToMonoExchangeRateResponse;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
