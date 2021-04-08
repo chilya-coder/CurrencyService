@@ -21,7 +21,6 @@ public class JsonToPrivateArchiveExchangeRate implements Converter <String, Priv
             return new PrivatbankArchiveExchangeRateResponse(new ObjectMapper().readValue(s, new TypeReference<List<PrivateArchiveExchangeRate>>() {}));
         } catch (JsonProcessingException e) {
             logger.error("Can't convert" + s + " to " + JsonToPrivateArchiveExchangeRate.class);
-            System.out.println("Can't convert");
         }
         return null;
     }

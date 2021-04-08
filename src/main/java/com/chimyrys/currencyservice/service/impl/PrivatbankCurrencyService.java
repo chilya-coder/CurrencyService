@@ -20,8 +20,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Service that give us functionality of PrivatBank API for:
@@ -48,85 +48,72 @@ public class PrivatbankCurrencyService implements CurrencyService {
     }
 
     @Override
-    public ExchangeRate getCurrency(LocalDate date, Currency currencyFrom, Currency currencyTo) {
+    public Optional<ExchangeRate> getCurrency(LocalDate date, Currency currencyFrom, Currency currencyTo) {
         logger.debug("Getting mono currency with params: " + currencyFrom.getValue() + ", "
                 + currencyTo.getValue());
-        String response = getResponseBodyFromBank(date);
-        logger.debug(env.getProperty("logging.string.covert.json_to_response")
-                + PrivatBankExchangeRateResponse.class);
-        PrivatBankExchangeRateResponse privatBankExchangeRateResponse = conversionService.convert(response, PrivatBankExchangeRateResponse.class);
+        String response;
         try {
-            logger.debug("Converting " + PrivatBankExchangeRateResponse.class + " to" +
-                    ExchangeRate.class);
-            List<ExchangeRate> privatbankExchangeRateList = conversionService.convert(privatBankExchangeRateResponse, List.class);
-            return privatbankExchangeRateList.stream()
-                    .filter(privatbankExchangeRate -> privatbankExchangeRate.getDate().equals(date))
-                    .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyFrom().equals(currencyFrom))
-                    .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyTo().equals(currencyTo))
-                    .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
-                    .iterator().next();
-        } catch (NoSuchElementException e) {
-            logger.error(env.getProperty("logging.string.no_param") + date.getYear() + "." + date.getMonth() + "."
-                    + date.getDayOfMonth() + ", currencyFrom: " + currencyFrom.getValue() + ", currencyTo: " + currencyTo);
-            return null;
+            response = getResponseBodyFromBank(date);
+        } catch (IOException e) {
+            logger.error(env.getProperty("logging.string.no_json"));
+            return Optional.empty();
         }
+        logger.debug(env.getProperty("logging.string.covert.json_to_response") + PrivatBankExchangeRateResponse.class);
+        PrivatBankExchangeRateResponse privatBankExchangeRateResponse = conversionService.convert(response, PrivatBankExchangeRateResponse.class);
+        logger.debug("Converting " + PrivatBankExchangeRateResponse.class + " to" + ExchangeRate.class);
+        List<ExchangeRate> privatbankExchangeRateList = conversionService.convert(privatBankExchangeRateResponse, List.class);
+        if(privatbankExchangeRateList == null) {
+            return Optional.empty();
+        }
+        return privatbankExchangeRateList.stream()
+                .filter(privatbankExchangeRate -> privatbankExchangeRate.getDate().equals(date))
+                .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyFrom().equals(currencyFrom))
+                .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyTo().equals(currencyTo))
+                .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
+                .findAny();
     }
 
     @Override
-    public ExchangeRate getBestBuyRateForMonth(Currency currencyFrom, Currency currencyTo) {
+    public Optional<ExchangeRate> getBestBuyRateForMonth(Currency currencyFrom, Currency currencyTo) {
         logger.debug("Getting privat best currency for month with params: " + currencyFrom.getValue() + ", "
                 + currencyTo.getValue());
-        String response = getResponseBodyFromBankMonthly(currencyFrom, currencyTo);
+        String response;
+        try {
+            response = getResponseBodyFromBankMonthly(currencyFrom, currencyTo);
+        } catch (IOException e) {
+            logger.error(env.getProperty("logging.string.no_json"));
+            return Optional.empty();
+        }
         logger.debug(env.getProperty("logging.string.covert.json_to_response")
                 + PrivatbankArchiveExchangeRateResponse.class);
         PrivatbankArchiveExchangeRateResponse privatbankArchiveExchangeRateResponse = conversionService.convert(response, PrivatbankArchiveExchangeRateResponse.class);
         if (privatbankArchiveExchangeRateResponse == null) {
-            return null;
+            return Optional.empty();
         }
-        try {
-            logger.debug("Converting " + PrivatbankArchiveExchangeRateResponse.class + " to" +
-                    ExchangeRate.class);
-            return privatbankArchiveExchangeRateResponse.getPrivateArchiveExchangeRateList().stream()
-                    .map(privateArchiveExchangeRate -> conversionService.convert(privateArchiveExchangeRate, ExchangeRate.class))
-                    .filter(Objects::nonNull)
-                    .peek(exchangeRate -> exchangeRate.setCurrencyFrom(currencyFrom))
-                    .peek(exchangeRate -> exchangeRate.setCurrencyTo(currencyTo))
-                    .filter(exchangeRate -> currencyTo.equals(exchangeRate.getCurrencyTo()))
-                    .filter(exchangeRate -> currencyFrom.equals(exchangeRate.getCurrencyFrom()))
-                    .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
-                    .min((exchangeRate1, exchangeRate2) -> Float.compare(exchangeRate1.getBuyRate(), exchangeRate2.getBuyRate()))
-                    .orElseThrow();
-        } catch (NoSuchElementException e) {
-            logger.error(env.getProperty("logging.string.no_param") + currencyFrom.getValue() + ", currencyTo=" + currencyTo.getValue());
-            return null;
-        }
+        logger.debug("Converting " + PrivatbankArchiveExchangeRateResponse.class + " to" + ExchangeRate.class);
+        return privatbankArchiveExchangeRateResponse.getPrivateArchiveExchangeRateList().stream()
+                .map(privateArchiveExchangeRate -> conversionService.convert(privateArchiveExchangeRate, ExchangeRate.class))
+                .filter(Objects::nonNull)
+                .peek(exchangeRate -> exchangeRate.setCurrencyFrom(currencyFrom))
+                .peek(exchangeRate -> exchangeRate.setCurrencyTo(currencyTo))
+                .filter(exchangeRate -> currencyTo.equals(exchangeRate.getCurrencyTo()))
+                .filter(exchangeRate -> currencyFrom.equals(exchangeRate.getCurrencyFrom()))
+                .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
+                .min((exchangeRate1, exchangeRate2) -> Float.compare(exchangeRate1.getBuyRate(), exchangeRate2.getBuyRate()));
     }
 
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    private String getResponseBodyFromBank(LocalDate date) {
+    private String getResponseBodyFromBank(LocalDate date) throws IOException {
         HttpClient httpClient = HttpClients.createDefault();
         logger.debug("Try to get response about exchange rate from privatbank");
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                 .queryParam("json")
                 .queryParam("date", date.getDayOfMonth() + "." + date.getMonthValue() + "." + date.getYear());
         HttpGet httpGet = new HttpGet(builder.build().encode().toUriString());
-        HttpResponse httpResponse = null;
-        String json = null;
-        try {
-            httpResponse = httpClient.execute(httpGet);
-            json =  EntityUtils.toString(httpResponse.getEntity());
-        } catch (IOException e) {
-            logger.error(env.getProperty("logging.string.no_json"));
-            e.printStackTrace();
-        }
-        return json;
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        return EntityUtils.toString(httpResponse.getEntity());
     }
 
-    private String getResponseBodyFromBankMonthly(Currency currencyFrom, Currency currencyTo) {
+    private String getResponseBodyFromBankMonthly(Currency currencyFrom, Currency currencyTo) throws IOException {
         HttpClient httpClient = HttpClients.createDefault();
         logger.debug("Try to get response about exchange rate from privatbank");
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url_monthly)
@@ -134,16 +121,13 @@ public class PrivatbankCurrencyService implements CurrencyService {
                 .queryParam("from_currency", Currency.getValueFromId(currencyFrom.getId()))
                 .queryParam("to_currency", Currency.getValueFromId(currencyTo.getId()));
         HttpGet httpGet = new HttpGet(builder.build().encode().toUriString());
-        HttpResponse httpResponse = null;
-        String json = null;
-        try {
-            httpResponse = httpClient.execute(httpGet);
-            json =  EntityUtils.toString(httpResponse.getEntity());
-        } catch (IOException e) {
-            logger.error(env.getProperty("logging.string.no_json"));
-            e.printStackTrace();
-        }
-        return json;
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        return EntityUtils.toString(httpResponse.getEntity());
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
     @Override
     public String getName() {

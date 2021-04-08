@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -42,18 +43,19 @@ public class GetAllExchangeRatesController {
                                                                   @RequestParam String date) {
         logger.info("Getting all exchange rates from all banks");
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        ExecutorCompletionService<ExchangeRate> completionService = new ExecutorCompletionService<>(executorService);
+        ExecutorCompletionService<Optional<ExchangeRate>> completionService = new ExecutorCompletionService<>(executorService);
         List<ExchangeRate> list = new ArrayList<>();
-        List<Future<ExchangeRate>> futureList = new ArrayList<>();
+        List<Future<Optional<ExchangeRate>>> futureList = new ArrayList<>();
         for (CurrencyService currencyService: currencyServices) {
             futureList.add(completionService.submit(
                     () -> currencyService.getCurrency(LocalDate.parse(date, dateTimeFormatter),
                             Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo))
             ));
         }
-        for(Future<ExchangeRate> future: futureList) {
+        for(Future<Optional<ExchangeRate>> future: futureList) {
             try {
-                list.add(future.get());
+                Optional<ExchangeRate> exchangeRate = future.get();
+                exchangeRate.ifPresent(list::add);
             } catch (InterruptedException | ExecutionException e) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

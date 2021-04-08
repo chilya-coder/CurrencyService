@@ -4,7 +4,6 @@ import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.model.privatbank.PrivatBankExchangeRateResponse;
 import com.chimyrys.currencyservice.model.privatbank.PrivatbankExchangeRate;
-import org.apache.log4j.Logger;
 import org.springframework.core.convert.converter.Converter;
 
 import java.time.LocalDate;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrivatExchangeRateToExchangeRate implements Converter<PrivatBankExchangeRateResponse, List<ExchangeRate>> {
-    private final static Logger logger = Logger.getLogger(PrivatExchangeRateToExchangeRate.class);
     private final DateTimeFormatter dateTimeFormatter;
 
     public PrivatExchangeRateToExchangeRate() {
@@ -29,8 +27,6 @@ public class PrivatExchangeRateToExchangeRate implements Converter<PrivatBankExc
             if (privatbankExchangeRate.getCurrency() == null) {
                 continue;
             }
-
-            logger.error("Can't convert" + PrivatBankExchangeRateResponse.class + " to " + ExchangeRate.class);
             try {
                 Currency currency = Currency.valueOf(privatbankExchangeRate.getCurrency());
                 list.add(new ExchangeRate(currency, baseCurrency,

@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 public abstract class AbstractController {
@@ -47,12 +48,12 @@ public abstract class AbstractController {
                                                         @RequestParam String currencyTo) {
         logger.info("Getting currency from " + currencyService.getName() + " for date=" + date + ","
                 + " currencyFrom=" + currencyFrom + "," + " currencyTo=" + currencyTo);
-        ExchangeRate response = currencyService
+        Optional<ExchangeRate> response = currencyService
                 .getCurrency(LocalDate.parse(date, dateTimeFormatter), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
-        if (response != null) {
-            return new ResponseEntity<>(response, HttpStatus.OK);
+        if (response.isPresent()) {
+            return new ResponseEntity<>(response.get(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -63,11 +64,17 @@ public abstract class AbstractController {
      */
     @RequestMapping(value = "/getbestcurrency/month")
     @GetMapping
-    public ExchangeRate bestCurrencyMonth(@RequestParam String currencyFrom,
-                                          @RequestParam String currencyTo) {
+    public ResponseEntity<ExchangeRate> bestCurrencyMonth(@RequestParam String currencyFrom,
+                                                    @RequestParam String currencyTo) {
         logger.info("Getting currency from " + currencyService.getName() + "for month:"
                 + "currencyFrom=" + currencyFrom + "," + " currencyTo=" + currencyTo);
-        return currencyService.getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+        Optional<ExchangeRate> response = currencyService
+                .getBestBuyRateForMonth(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+        if (response.isPresent()) {
+            return new ResponseEntity<>(response.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     }
 
     @RequestMapping(value = "/saveExchangeRateToDoc")
@@ -76,14 +83,17 @@ public abstract class AbstractController {
                                                       @RequestParam String currencyTo,
                                                       @RequestParam String date) {
         logger.info("Saving info about" + currencyService.getName() + "to doc file");
-        byte[] doc = saveDataToDocService.saveExchangeRate(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo),
+        Optional<byte[]> doc = saveDataToDocService.saveExchangeRateToDoc(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo),
                 LocalDate.parse(date, dateTimeFormatter), currencyService);
+        if(doc.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDispositionFormData(Objects.requireNonNull(env.getProperty("attachment")), env.getProperty("filename"));
         headers.setContentType(new MediaType(Objects.requireNonNull(env.getProperty("application")), Objects.requireNonNull(env.getProperty("mime-type.word"))));
-        headers.setContentLength(doc.length);
+        headers.setContentLength(doc.get().length);
         InputStreamResource inputStreamResource = new InputStreamResource
-                (new ByteArrayInputStream(doc));
+                (new ByteArrayInputStream(doc.get()));
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(inputStreamResource);

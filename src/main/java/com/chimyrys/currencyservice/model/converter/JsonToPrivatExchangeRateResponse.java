@@ -15,7 +15,6 @@ public class JsonToPrivatExchangeRateResponse implements Converter<String, Priva
             return new ObjectMapper().readValue(s, PrivatBankExchangeRateResponse.class);
         } catch (JsonProcessingException e) {
             logger.error("Can't convert" + s + " to " + PrivatBankExchangeRateResponse.class);
-            System.out.println("Can't convert");
         }
         return null;
     }

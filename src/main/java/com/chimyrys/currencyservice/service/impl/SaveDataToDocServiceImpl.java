@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SaveDataToDocServiceImpl implements SaveDataToDocService {
@@ -37,8 +38,12 @@ public class SaveDataToDocServiceImpl implements SaveDataToDocService {
      * @return
      */
     @Override
-    public byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, LocalDate date, CurrencyService currencyService) {
-        ExchangeRate exchangeRate = currencyService.getCurrency(date, currencyFrom, currencyTo);
+    public Optional<byte[]> saveExchangeRateToDoc(Currency currencyFrom, Currency currencyTo, LocalDate date, CurrencyService currencyService) {
+        Optional<ExchangeRate> optionalExchangeRate = currencyService.getCurrency(date, currencyFrom, currencyTo);
+        if (optionalExchangeRate.isEmpty()) {
+            return Optional.empty();
+        }
+        ExchangeRate exchangeRate = optionalExchangeRate.get();
         try {
             logger.debug("Filling info to doc");
             XWPFDocument document = new XWPFDocument(OPCPackage.open(template));
@@ -56,11 +61,11 @@ public class SaveDataToDocServiceImpl implements SaveDataToDocService {
             }
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             document.write(stream);
-            return stream.toByteArray();
+            return Optional.of(stream.toByteArray());
         } catch (IOException | InvalidFormatException e) {
             logger.error("Can't save data to doc file");
             e.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 }
