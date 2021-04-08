@@ -11,7 +11,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
- /**
+/**
  * Service that give us functionality of MonoBank API for:
  * 1) getting converted currency for specific day
  * 2) getting best (with minimum buy rate) currency for month
@@ -48,14 +47,15 @@ public class MonobankCurrencyService implements CurrencyService {
     public ExchangeRate getCurrency(LocalDate date, Currency currencyFrom, Currency currencyTo) {
         logger.debug("Getting mono currency with params: " + currencyFrom.getValue() + ", "
                 + currencyTo.getValue());
-        String response = getResponseBodyFromBank();
+        String response = null;
+        try {
+            response = getResponseBodyFromBank();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         logger.debug(env.getProperty("logging.string.covert.json_to_response")
                 + MonoBankExchangeRateResponse.class);
         MonoBankExchangeRateResponse monoBankExchangeRateResponse = conversionService.convert(response, MonoBankExchangeRateResponse.class);
-        if (Objects.isNull(monoBankExchangeRateResponse)) {
-            logger.error("monoBankExchangeRateResponse is null");
-            throw new NullPointerException();
-        }
             try {
                 logger.debug("Converting " + MonoBankExchangeRateResponse.class + " to" +
                         ExchangeRate.class);
@@ -80,7 +80,12 @@ public class MonobankCurrencyService implements CurrencyService {
     public ExchangeRate getBestBuyRateForMonth(Currency currencyFrom, Currency currencyTo) {
         logger.debug("Getting mono best currency for month with params: " + currencyFrom.getValue() + ", "
         + currencyTo.getValue());
-        String response = getResponseBodyFromBank();
+        String response = null;
+        try {
+            response = getResponseBodyFromBank();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         logger.debug(env.getProperty("logging.string.covert.json_to_response")
                 + MonoBankExchangeRateResponse.class);
         MonoBankExchangeRateResponse monoBankExchangeRateResponse = conversionService.convert(response, MonoBankExchangeRateResponse.class);
@@ -106,19 +111,14 @@ public class MonobankCurrencyService implements CurrencyService {
         }
     }
 
-    private String getResponseBodyFromBank() {
+    private String getResponseBodyFromBank() throws IOException {
         HttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(url);
         logger.debug("Try to get response about exchange rate from monobank");
-        HttpResponse httpResponse = null;
-        String json = null;
-        try {
-            httpResponse = httpClient.execute(httpGet);
-            json =  EntityUtils.toString(httpResponse.getEntity());
-        } catch (IOException e) {
-            logger.error(env.getProperty("logging.string.no_json"));
-            return null;
-        }
+        HttpResponse httpResponse;
+        String json;
+        httpResponse = httpClient.execute(httpGet);
+        json =  EntityUtils.toString(httpResponse.getEntity());
         logger.debug("Response from monobank is got");
         return json;
     }

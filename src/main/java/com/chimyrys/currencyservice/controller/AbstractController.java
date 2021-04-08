@@ -5,6 +5,7 @@ import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import com.chimyrys.currencyservice.service.api.SaveDataToDocService;
 import org.apache.log4j.Logger;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @RestController
 public abstract class AbstractController {
@@ -25,9 +27,10 @@ public abstract class AbstractController {
     private final static Logger logger = Logger.getLogger(AbstractController.class);
     private final SaveDataToDocService saveDataToDocService;
     private final DateTimeFormatter dateTimeFormatter;
-
-    public AbstractController(SaveDataToDocService saveDataToDocService) {
+    private final Environment env;
+    public AbstractController(SaveDataToDocService saveDataToDocService, Environment env) {
         this.saveDataToDocService = saveDataToDocService;
+        this.env = env;
         this.dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
@@ -76,8 +79,8 @@ public abstract class AbstractController {
         byte[] doc = saveDataToDocService.saveExchangeRate(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo),
                 LocalDate.parse(date, dateTimeFormatter), currencyService);
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentDispositionFormData("attachment", "ExchangeRateWordFile.docx");
-        headers.setContentType(new MediaType("application", "vnd.openxmlformats-officedocument.wordprocessingml.document"));
+        headers.setContentDispositionFormData(Objects.requireNonNull(env.getProperty("attachment")), env.getProperty("filename"));
+        headers.setContentType(new MediaType(Objects.requireNonNull(env.getProperty("application")), Objects.requireNonNull(env.getProperty("mime-type.word"))));
         headers.setContentLength(doc.length);
         InputStreamResource inputStreamResource = new InputStreamResource
                 (new ByteArrayInputStream(doc));

@@ -1,6 +1,7 @@
 package com.chimyrys.currencyservice.service.impl;
 
-import com.chimyrys.currencyservice.model.*;
+import com.chimyrys.currencyservice.model.Currency;
+import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.model.privatbank.PrivatBankExchangeRateResponse;
 import com.chimyrys.currencyservice.model.privatbank.PrivatbankArchiveExchangeRateResponse;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
@@ -11,7 +12,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -55,10 +55,6 @@ public class PrivatbankCurrencyService implements CurrencyService {
         logger.debug(env.getProperty("logging.string.covert.json_to_response")
                 + PrivatBankExchangeRateResponse.class);
         PrivatBankExchangeRateResponse privatBankExchangeRateResponse = conversionService.convert(response, PrivatBankExchangeRateResponse.class);
-        if (privatBankExchangeRateResponse == null) {
-            return null;
-        }
-
         try {
             logger.debug("Converting " + PrivatBankExchangeRateResponse.class + " to" +
                     ExchangeRate.class);

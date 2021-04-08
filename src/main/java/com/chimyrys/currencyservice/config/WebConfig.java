@@ -1,6 +1,11 @@
 package com.chimyrys.currencyservice.config;
 
-import com.chimyrys.currencyservice.model.converter.*;
+import com.chimyrys.currencyservice.model.converter.JsonToMonoExchangeRateResponse;
+import com.chimyrys.currencyservice.model.converter.JsonToPrivatExchangeRateResponse;
+import com.chimyrys.currencyservice.model.converter.JsonToPrivateArchiveExchangeRate;
+import com.chimyrys.currencyservice.model.converter.MonoExchangeRateToExchangeRate;
+import com.chimyrys.currencyservice.model.converter.PrivatArchiveExchangeRateToExchangeRate;
+import com.chimyrys.currencyservice.model.converter.PrivatExchangeRateToExchangeRate;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
