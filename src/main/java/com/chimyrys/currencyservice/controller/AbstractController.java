@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @RestController
@@ -46,7 +45,7 @@ public abstract class AbstractController {
         logger.info("Getting currency from " + currencyService.getName() + " for date=" + date + ","
                 + " currencyFrom=" + currencyFrom + "," + " currencyTo=" + currencyTo);
         ExchangeRate response = currencyService
-                .getCurrency(LocalDate.parse(date, dateTimeFormatter).atStartOfDay(), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+                .getCurrency(LocalDate.parse(date, dateTimeFormatter), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
         if (response != null) {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
@@ -75,7 +74,7 @@ public abstract class AbstractController {
                                                       @RequestParam String date) {
         logger.info("Saving info about" + currencyService.getName() + "to doc file");
         byte[] doc = saveDataToDocService.saveExchangeRate(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo),
-                LocalDateTime.parse(date, dateTimeFormatter), currencyService);
+                LocalDate.parse(date, dateTimeFormatter), currencyService);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDispositionFormData("attachment", "ExchangeRateWordFile.docx");
         headers.setContentType(new MediaType("application", "vnd.openxmlformats-officedocument.wordprocessingml.document"));

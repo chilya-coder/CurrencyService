@@ -17,7 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -28,7 +28,6 @@ import java.util.Objects;
  * 2) getting best (with minimum buy rate) currency for month
  */
 @Service
-@PropertySource("classpath:/application.properties")
 public class MonobankCurrencyService implements CurrencyService {
     private final static Logger logger = Logger.getLogger(MonobankCurrencyService.class);
     @Value(value = "${monobank.id}")
@@ -46,7 +45,7 @@ public class MonobankCurrencyService implements CurrencyService {
     }
 
     @Override
-    public ExchangeRate getCurrency(LocalDateTime date, Currency currencyFrom, Currency currencyTo) {
+    public ExchangeRate getCurrency(LocalDate date, Currency currencyFrom, Currency currencyTo) {
         logger.debug("Getting mono currency with params: " + currencyFrom.getValue() + ", "
                 + currencyTo.getValue());
         String response = getResponseBodyFromBank();
@@ -71,7 +70,7 @@ public class MonobankCurrencyService implements CurrencyService {
                         .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
                         .findAny().orElseThrow();
             } catch (NoSuchElementException e) {
-                logger.error(env.getProperty("logging.string.no_param") +  "date=" + date.getYear() + "." + date.getMonth() + "."
+                logger.error(env.getProperty("logging.string.no_param") +  "date=" + date.getYear() + "." + date.getMonth().getValue() + "."
                 + date.getDayOfMonth() + ", currencyFrom=" + currencyFrom.getValue() + ", currencyTo=" + currencyTo);
                 return null;
             }

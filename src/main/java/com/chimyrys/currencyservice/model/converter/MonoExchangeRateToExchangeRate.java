@@ -20,6 +20,6 @@ public class MonoExchangeRateToExchangeRate implements Converter<MonobankExchang
                 Currency.getValueFromId(monobankExchangeRate.getCurrencyCodeB()),
                 monobankExchangeRate.getRateSell(),
                 monobankExchangeRate.getRateBuy(),
-                LocalDateTime.ofInstant(Instant.ofEpochSecond(monobankExchangeRate.getDate()), ZoneId.systemDefault()));
+                LocalDateTime.ofInstant(Instant.ofEpochSecond(monobankExchangeRate.getDate()), ZoneId.systemDefault()).toLocalDate());
     }
 }

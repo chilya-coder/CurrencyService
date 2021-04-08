@@ -2,7 +2,7 @@ package com.chimyrys.currencyservice.service.api;
 
 import com.chimyrys.currencyservice.model.Currency;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * Interface for saving doc files
@@ -15,5 +15,5 @@ public interface SaveDataToDocService {
      * @param date
      * @return
      */
-    byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, LocalDateTime date, CurrencyService currencyService);
+    byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, LocalDate date, CurrencyService currencyService);
 }

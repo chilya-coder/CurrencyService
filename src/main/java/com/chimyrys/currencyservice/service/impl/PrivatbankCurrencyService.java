@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -29,7 +29,6 @@ import java.util.Objects;
  * 2) getting best (with minimum buy rate) currency for month
  */
 @Service
-@PropertySource("classpath:/application.properties")
 public class PrivatbankCurrencyService implements CurrencyService {
     private final static Logger logger = Logger.getLogger(PrivatbankCurrencyService.class);
     @Value(value = "${privat.id}")
@@ -49,7 +48,7 @@ public class PrivatbankCurrencyService implements CurrencyService {
     }
 
     @Override
-    public ExchangeRate getCurrency(LocalDateTime date, Currency currencyFrom, Currency currencyTo) {
+    public ExchangeRate getCurrency(LocalDate date, Currency currencyFrom, Currency currencyTo) {
         logger.debug("Getting mono currency with params: " + currencyFrom.getValue() + ", "
                 + currencyTo.getValue());
         String response = getResponseBodyFromBank(date);
@@ -112,7 +111,7 @@ public class PrivatbankCurrencyService implements CurrencyService {
         return id;
     }
 
-    private String getResponseBodyFromBank(LocalDateTime date) {
+    private String getResponseBodyFromBank(LocalDate date) {
         HttpClient httpClient = HttpClients.createDefault();
         logger.debug("Try to get response about exchange rate from privatbank");
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)

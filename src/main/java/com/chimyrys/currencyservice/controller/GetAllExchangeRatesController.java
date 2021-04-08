@@ -16,7 +16,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @RestController
 public class GetAllExchangeRatesController {
@@ -43,7 +47,7 @@ public class GetAllExchangeRatesController {
         List<Future<ExchangeRate>> futureList = new ArrayList<>();
         for (CurrencyService currencyService: currencyServices) {
             futureList.add(completionService.submit(
-                    () -> currencyService.getCurrency(LocalDate.parse(date, dateTimeFormatter).atStartOfDay(),
+                    () -> currencyService.getCurrency(LocalDate.parse(date, dateTimeFormatter),
                             Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo))
             ));
         }

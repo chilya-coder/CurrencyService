@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -37,7 +37,7 @@ public class SaveDataToDocServiceImpl implements SaveDataToDocService {
      * @return
      */
     @Override
-    public byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, LocalDateTime date, CurrencyService currencyService) {
+    public byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, LocalDate date, CurrencyService currencyService) {
         ExchangeRate exchangeRate = currencyService.getCurrency(date, currencyFrom, currencyTo);
         try {
             logger.debug("Filling info to doc");

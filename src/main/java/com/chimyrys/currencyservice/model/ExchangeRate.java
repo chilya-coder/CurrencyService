@@ -1,6 +1,6 @@
 package com.chimyrys.currencyservice.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * Class that describes exchange rate for ALL banks
@@ -15,9 +15,9 @@ public class ExchangeRate {
     private Currency currencyTo; // currency we convert to
     private float sellRate; // how much currency is worth to buy
     private float buyRate; // how much currency is worth to sell
-    private LocalDateTime date; //date
+    private LocalDate date; //date
 
-    public ExchangeRate(Currency baseCurrency, Currency currency, float sellRate, float buyRate, LocalDateTime date) {
+    public ExchangeRate(Currency baseCurrency, Currency currency, float sellRate, float buyRate, LocalDate date) {
         this.currencyFrom = baseCurrency;
         this.currencyTo = currency;
         this.sellRate = sellRate;
@@ -25,7 +25,7 @@ public class ExchangeRate {
         this.date = date;
     }
 
-    public ExchangeRate(float sellRate, float buyRate, LocalDateTime date) {
+    public ExchangeRate(float sellRate, float buyRate, LocalDate date) {
         this.sellRate = sellRate;
         this.buyRate = buyRate;
         this.date = date;
@@ -68,11 +68,11 @@ public class ExchangeRate {
         this.buyRate = buyRate;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -83,7 +83,7 @@ public class ExchangeRate {
                 ", currencyTo=" + currencyTo +
                 ", sellRate=" + sellRate +
                 ", buyRate=" + buyRate +
-                ", date=" + date.toLocalDate() +
+                ", date=" + date +
                 '}';
     }
 }

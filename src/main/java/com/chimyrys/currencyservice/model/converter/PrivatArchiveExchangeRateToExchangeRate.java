@@ -5,7 +5,7 @@ import com.chimyrys.currencyservice.model.privatbank.PrivateArchiveExchangeRate;
 import org.springframework.core.convert.converter.Converter;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.ZoneId;
 
 /**
@@ -16,6 +16,6 @@ public class PrivatArchiveExchangeRateToExchangeRate implements Converter<Privat
     public ExchangeRate convert(PrivateArchiveExchangeRate privateArchiveExchangeRate) {
         return new ExchangeRate(privateArchiveExchangeRate.getSellPrice(),
                 privateArchiveExchangeRate.getBuyPrice(),
-                LocalDateTime.ofInstant(Instant.ofEpochMilli(privateArchiveExchangeRate.getDate()), ZoneId.systemDefault()));
+                LocalDate.ofInstant(Instant.ofEpochMilli(privateArchiveExchangeRate.getDate()), ZoneId.systemDefault()));
     }
 }
