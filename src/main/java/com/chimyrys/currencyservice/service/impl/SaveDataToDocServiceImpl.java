@@ -2,10 +2,8 @@ package com.chimyrys.currencyservice.service.impl;
 
 import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
-import com.chimyrys.currencyservice.model.RateDate;
-import com.chimyrys.currencyservice.model.converter.JsonToMonoExchangeRateResponse;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
-import com.chimyrys.currencyservice.service.api.SaveInfoService;
+import com.chimyrys.currencyservice.service.api.SaveDataToDocService;
 import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -17,15 +15,16 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class SaveInfoServiceImpl implements SaveInfoService {
-    private final static Logger logger = Logger.getLogger(SaveInfoServiceImpl.class);
+public class SaveDataToDocServiceImpl implements SaveDataToDocService {
+    private final static Logger logger = Logger.getLogger(SaveDataToDocServiceImpl.class);
     private final List<CurrencyService> currencyServices;
     private final File template;
 
-    public SaveInfoServiceImpl(List<CurrencyService> currencyServices) {
+    public SaveDataToDocServiceImpl(List<CurrencyService> currencyServices) {
         template = new File("template.docx");
         this.currencyServices = currencyServices;
     }
@@ -34,12 +33,12 @@ public class SaveInfoServiceImpl implements SaveInfoService {
      * Method that saves bank info into doc template file
      * @param currencyFrom
      * @param currencyTo
-     * @param rateDate
+     * @param date
      * @return
      */
     @Override
-    public byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, RateDate rateDate, CurrencyService currencyService) {
-        ExchangeRate exchangeRate = currencyService.getCurrency(rateDate, currencyFrom, currencyTo);
+    public byte[] saveExchangeRate(Currency currencyFrom, Currency currencyTo, LocalDateTime date, CurrencyService currencyService) {
+        ExchangeRate exchangeRate = currencyService.getCurrency(date, currencyFrom, currencyTo);
         try {
             logger.debug("Filling info to doc");
             XWPFDocument document = new XWPFDocument(OPCPackage.open(template));
@@ -51,7 +50,7 @@ public class SaveInfoServiceImpl implements SaveInfoService {
                     text = text.replace("CURTO", currencyTo.getValue());
                     text = text.replace("BUY", Float.toString(exchangeRate.getBuyRate()));
                     text = text.replace("SELL", Float.toString(exchangeRate.getSellRate()));
-                    text = text.replace("DATE", exchangeRate.getDateTime().toString());
+                    text = text.replace("DATE", exchangeRate.getDate().toString());
                     run.setText(text,0);
                 }
             }

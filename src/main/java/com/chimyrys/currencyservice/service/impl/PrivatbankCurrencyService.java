@@ -1,7 +1,6 @@
 package com.chimyrys.currencyservice.service.impl;
 
 import com.chimyrys.currencyservice.model.*;
-import com.chimyrys.currencyservice.model.converter.JsonToMonoExchangeRateResponse;
 import com.chimyrys.currencyservice.model.privatbank.PrivatBankExchangeRateResponse;
 import com.chimyrys.currencyservice.model.privatbank.PrivatbankArchiveExchangeRateResponse;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -49,10 +49,10 @@ public class PrivatbankCurrencyService implements CurrencyService {
     }
 
     @Override
-    public ExchangeRate getCurrency(RateDate rateDate, Currency currencyFrom, Currency currencyTo) {
+    public ExchangeRate getCurrency(LocalDateTime date, Currency currencyFrom, Currency currencyTo) {
         logger.debug("Getting mono currency with params: " + currencyFrom.getValue() + ", "
                 + currencyTo.getValue());
-        String response = getResponseBodyFromBank(rateDate);
+        String response = getResponseBodyFromBank(date);
         logger.debug(env.getProperty("logging.string.covert.json_to_response")
                 + PrivatBankExchangeRateResponse.class);
         PrivatBankExchangeRateResponse privatBankExchangeRateResponse = conversionService.convert(response, PrivatBankExchangeRateResponse.class);
@@ -65,14 +65,14 @@ public class PrivatbankCurrencyService implements CurrencyService {
                     ExchangeRate.class);
             List<ExchangeRate> privatbankExchangeRateList = conversionService.convert(privatBankExchangeRateResponse, List.class);
             return privatbankExchangeRateList.stream()
-                    .filter(privatbankExchangeRate -> privatbankExchangeRate.getDateTime().equals(rateDate))
+                    .filter(privatbankExchangeRate -> privatbankExchangeRate.getDate().equals(date))
                     .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyFrom().equals(currencyFrom))
                     .filter(privatbankExchangeRate -> privatbankExchangeRate.getCurrencyTo().equals(currencyTo))
                     .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
                     .iterator().next();
         } catch (NoSuchElementException e) {
-            logger.error(env.getProperty("logging.string.no_param") + rateDate.getYear() + "." + rateDate.getMonth() + "."
-                    + rateDate.getDay() + ", currencyFrom: " + currencyFrom.getValue() + ", currencyTo: " + currencyTo);
+            logger.error(env.getProperty("logging.string.no_param") + date.getYear() + "." + date.getMonth() + "."
+                    + date.getDayOfMonth() + ", currencyFrom: " + currencyFrom.getValue() + ", currencyTo: " + currencyTo);
             return null;
         }
     }
@@ -112,12 +112,12 @@ public class PrivatbankCurrencyService implements CurrencyService {
         return id;
     }
 
-    private String getResponseBodyFromBank(RateDate rateDate) {
+    private String getResponseBodyFromBank(LocalDateTime date) {
         HttpClient httpClient = HttpClients.createDefault();
         logger.debug("Try to get response about exchange rate from privatbank");
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                 .queryParam("json")
-                .queryParam("date", rateDate.getDay() + "." + rateDate.getMonth() + "." + rateDate.getYear());
+                .queryParam("date", date.getDayOfMonth() + "." + date.getMonthValue() + "." + date.getYear());
         HttpGet httpGet = new HttpGet(builder.build().encode().toUriString());
         HttpResponse httpResponse = null;
         String json = null;

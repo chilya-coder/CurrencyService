@@ -2,7 +2,6 @@ package com.chimyrys.currencyservice.controller;
 
 import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
-import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,23 +12,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.*;
 
 @RestController
-public class GetAllExchangeRates {
+public class GetAllExchangeRatesController {
     private final List<CurrencyService> currencyServices;
     @Value("${controller.numberOfThreads}")
     private int numberOfThreads;
-    private final static Logger logger = Logger.getLogger(GetAllExchangeRates.class);
+    private final static Logger logger = Logger.getLogger(GetAllExchangeRatesController.class);
+    private final DateTimeFormatter dateTimeFormatter;
 
-    public GetAllExchangeRates(List<CurrencyService> currencyServices) {
+    public GetAllExchangeRatesController(List<CurrencyService> currencyServices) {
         this.currencyServices = currencyServices;
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
     @RequestMapping(value="/getAllExchangeRates")
@@ -44,7 +43,8 @@ public class GetAllExchangeRates {
         List<Future<ExchangeRate>> futureList = new ArrayList<>();
         for (CurrencyService currencyService: currencyServices) {
             futureList.add(completionService.submit(
-                    () -> currencyService.getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo))
+                    () -> currencyService.getCurrency(LocalDate.parse(date, dateTimeFormatter).atStartOfDay(),
+                            Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo))
             ));
         }
         for(Future<ExchangeRate> future: futureList) {

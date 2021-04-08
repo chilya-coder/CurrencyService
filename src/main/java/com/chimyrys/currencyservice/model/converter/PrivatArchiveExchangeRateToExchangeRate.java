@@ -2,8 +2,11 @@ package com.chimyrys.currencyservice.model.converter;
 
 import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.model.privatbank.PrivateArchiveExchangeRate;
-import com.chimyrys.currencyservice.model.RateDate;
 import org.springframework.core.convert.converter.Converter;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * Class that converts PrivatArchiveExchangeRate objects to ExchangeRate
@@ -13,6 +16,6 @@ public class PrivatArchiveExchangeRateToExchangeRate implements Converter<Privat
     public ExchangeRate convert(PrivateArchiveExchangeRate privateArchiveExchangeRate) {
         return new ExchangeRate(privateArchiveExchangeRate.getSellPrice(),
                 privateArchiveExchangeRate.getBuyPrice(),
-                RateDate.createDateFromMillis(privateArchiveExchangeRate.getDate()));
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(privateArchiveExchangeRate.getDate()), ZoneId.systemDefault()));
     }
 }

@@ -3,7 +3,6 @@ package com.chimyrys.currencyservice.service.impl;
 import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.model.monobank.MonoBankExchangeRateResponse;
-import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -46,7 +46,7 @@ public class MonobankCurrencyService implements CurrencyService {
     }
 
     @Override
-    public ExchangeRate getCurrency(RateDate rateDate, Currency currencyFrom, Currency currencyTo) {
+    public ExchangeRate getCurrency(LocalDateTime date, Currency currencyFrom, Currency currencyTo) {
         logger.debug("Getting mono currency with params: " + currencyFrom.getValue() + ", "
                 + currencyTo.getValue());
         String response = getResponseBodyFromBank();
@@ -65,14 +65,14 @@ public class MonobankCurrencyService implements CurrencyService {
                         .filter(Objects::nonNull)
                         .filter(exchangeRate -> exchangeRate.getCurrencyTo() != null)
                         .filter(exchangeRate -> exchangeRate.getCurrencyFrom() != null)
-                        .filter(exchangeRate -> exchangeRate.getDateTime().equals(rateDate))
+                        .filter(exchangeRate -> exchangeRate.getDate().equals(date))
                         .filter(exchangeRate -> exchangeRate.getCurrencyTo().equals(currencyTo))
                         .filter(exchangeRate -> exchangeRate.getCurrencyFrom().equals(currencyFrom))
                         .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
                         .findAny().orElseThrow();
             } catch (NoSuchElementException e) {
-                logger.error(env.getProperty("logging.string.no_param") +  "rateDate=" + rateDate.getYear() + "." + rateDate.getMonth() + "."
-                + rateDate.getDay() + ", currencyFrom=" + currencyFrom.getValue() + ", currencyTo=" + currencyTo);
+                logger.error(env.getProperty("logging.string.no_param") +  "date=" + date.getYear() + "." + date.getMonth() + "."
+                + date.getDayOfMonth() + ", currencyFrom=" + currencyFrom.getValue() + ", currencyTo=" + currencyTo);
                 return null;
             }
     }
@@ -88,7 +88,6 @@ public class MonobankCurrencyService implements CurrencyService {
         if (monoBankExchangeRateResponse == null) {
             return null;
         }
-        RateDate currentRateDate = RateDate.createDateFromSeconds(Instant.now().getEpochSecond());
         try {
             logger.debug("Converting " + MonoBankExchangeRateResponse.class + " to" +
                     ExchangeRate.class);
@@ -97,8 +96,8 @@ public class MonobankCurrencyService implements CurrencyService {
                      .filter(Objects::nonNull)
                      .filter(exchangeRate -> currencyTo.equals(exchangeRate.getCurrencyTo()))
                      .filter(exchangeRate -> currencyFrom.equals(exchangeRate.getCurrencyFrom()))
-                     .filter(exchangeRate -> exchangeRate.getDateTime().getYear() == currentRateDate.getYear())
-                     .filter(exchangeRate -> exchangeRate.getDateTime().getMonth() == currentRateDate.getMonth())
+                     .filter(exchangeRate -> exchangeRate.getDate().getYear() == LocalDateTime.now().getYear())
+                     .filter(exchangeRate -> exchangeRate.getDate().getMonth() == LocalDateTime.now().getMonth())
                      .peek(exchangeRate -> logger.debug("Result: " + exchangeRate))
                      .min((exchangeRate1, exchangeRate2) -> Float.compare(exchangeRate1.getBuyRate(), exchangeRate2.getBuyRate()))
                      .orElseThrow();

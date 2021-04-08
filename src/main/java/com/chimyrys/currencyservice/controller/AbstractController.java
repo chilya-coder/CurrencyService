@@ -2,9 +2,8 @@ package com.chimyrys.currencyservice.controller;
 
 import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
-import com.chimyrys.currencyservice.model.RateDate;
 import com.chimyrys.currencyservice.service.api.CurrencyService;
-import com.chimyrys.currencyservice.service.api.SaveInfoService;
+import com.chimyrys.currencyservice.service.api.SaveDataToDocService;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -17,15 +16,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 public abstract class AbstractController {
     protected CurrencyService currencyService;
     private final static Logger logger = Logger.getLogger(AbstractController.class);
-    private final SaveInfoService saveInfoService;
+    private final SaveDataToDocService saveDataToDocService;
+    private final DateTimeFormatter dateTimeFormatter;
 
-    public AbstractController(SaveInfoService saveInfoService) {
-        this.saveInfoService = saveInfoService;
+    public AbstractController(SaveDataToDocService saveDataToDocService) {
+        this.saveDataToDocService = saveDataToDocService;
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
     /**
@@ -41,12 +45,12 @@ public abstract class AbstractController {
                                                         @RequestParam String currencyTo) {
         logger.info("Getting currency from " + currencyService.getName() + " for date=" + date + ","
                 + " currencyFrom=" + currencyFrom + "," + " currencyTo=" + currencyTo);
-        ExchangeRate monoResponse = currencyService
-                .getCurrency(new RateDate(date), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
-        if (monoResponse != null) {
-            return new ResponseEntity<>(monoResponse, HttpStatus.OK);
+        ExchangeRate response = currencyService
+                .getCurrency(LocalDate.parse(date, dateTimeFormatter).atStartOfDay(), Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo));
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(monoResponse, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -70,8 +74,8 @@ public abstract class AbstractController {
                                                       @RequestParam String currencyTo,
                                                       @RequestParam String date) {
         logger.info("Saving info about" + currencyService.getName() + "to doc file");
-        byte[] doc = saveInfoService.saveExchangeRate(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo),
-                new RateDate(date), currencyService);
+        byte[] doc = saveDataToDocService.saveExchangeRate(Currency.valueOf(currencyFrom), Currency.valueOf(currencyTo),
+                LocalDateTime.parse(date, dateTimeFormatter), currencyService);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDispositionFormData("attachment", "ExchangeRateWordFile.docx");
         headers.setContentType(new MediaType("application", "vnd.openxmlformats-officedocument.wordprocessingml.document"));

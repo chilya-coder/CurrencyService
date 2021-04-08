@@ -3,8 +3,11 @@ package com.chimyrys.currencyservice.model.converter;
 import com.chimyrys.currencyservice.model.Currency;
 import com.chimyrys.currencyservice.model.ExchangeRate;
 import com.chimyrys.currencyservice.model.monobank.MonobankExchangeRate;
-import com.chimyrys.currencyservice.model.RateDate;
 import org.springframework.core.convert.converter.Converter;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * Class that uses spring Converter to convert MonobankExchangeRate to ExchangeRate
@@ -17,6 +20,6 @@ public class MonoExchangeRateToExchangeRate implements Converter<MonobankExchang
                 Currency.getValueFromId(monobankExchangeRate.getCurrencyCodeB()),
                 monobankExchangeRate.getRateSell(),
                 monobankExchangeRate.getRateBuy(),
-                RateDate.createDateFromSeconds(monobankExchangeRate.getDate()));
+                LocalDateTime.ofInstant(Instant.ofEpochSecond(monobankExchangeRate.getDate()), ZoneId.systemDefault()));
     }
 }
